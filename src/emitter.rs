@@ -177,6 +177,13 @@ impl<'a> YamlEmitter<'a> {
                 write!(self.writer, "{}", v)?;
                 Ok(())
             }
+            Yaml::Comment(ref comments, ref node) => {
+                for comment in comments {
+                    write!(self.writer, "#{}\n", comment)?;
+                }
+                self.emit_node(node.as_ref())?;
+                Ok(())
+            }
             Yaml::Null | Yaml::BadValue => {
                 write!(self.writer, "~")?;
                 Ok(())
@@ -630,6 +637,17 @@ a:
         println!("emitted:\n{}", writer);
 
         assert_eq!(s, writer);
+    }
+    #[test]
+    fn test_emit_comments() {
+        let mut hash = Hash::new();
+        let key_with_comment = Yaml::Comment(vec!["comment1".to_string(), "comment2".to_string()], Box::new(Yaml::String("string".to_ascii_lowercase())));
+        hash.insert(key_with_comment, Yaml::Integer(100));
+        let mut writer = String::new();
+        let mut emit = YamlEmitter::new(&mut writer);
+        emit.dump(&Yaml::Hash(hash));
+        println!("Writen: \n{}", writer);
+
     }
 
 }
