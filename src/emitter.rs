@@ -177,6 +177,14 @@ impl<'a> YamlEmitter<'a> {
                 write!(self.writer, "{}", v)?;
                 Ok(())
             }
+            Yaml::Comment(ref comments, ref node) => {
+                for comment in comments {
+                    write!(self.writer, "#{}\n", comment)?;
+                    self.write_indent()?;
+                }
+                self.emit_node(node.as_ref())?;
+                Ok(())
+            }
             Yaml::Null | Yaml::BadValue => {
                 write!(self.writer, "~")?;
                 Ok(())
@@ -630,6 +638,29 @@ a:
         println!("emitted:\n{}", writer);
 
         assert_eq!(s, writer);
+    }
+
+    fn hash_fixture() -> Yaml {
+        let mut hash = Hash::new();
+        let key_with_comment1 = Yaml::Comment(vec!["comment1".to_string(), "comment2".to_string()], Box::new(Yaml::String("string".to_ascii_lowercase())));
+        let key_with_comment2 = Yaml::Comment(vec!["comment3".to_string(), "comment4".to_string()], Box::new(Yaml::String("string".to_ascii_lowercase())));
+        hash.insert(key_with_comment1, Yaml::Integer(100));
+        hash.insert(Yaml::String("blah".to_string()), Yaml::Integer(101));
+        hash.insert(key_with_comment2, Yaml::Integer(101));
+        Yaml::Hash(hash)
+    }
+
+    #[test]
+    fn test_emit_comments() {
+        let mut hash = Hash::new();
+        hash.insert(Yaml::String("test1".to_string()), hash_fixture());
+        hash.insert(Yaml::String("test2".to_string()), hash_fixture());
+
+        let mut writer = String::new();
+        let mut emit = YamlEmitter::new(&mut writer);
+        emit.dump(&Yaml::Hash(hash));
+        println!("Writen: \n{}", writer);
+
     }
 
 }

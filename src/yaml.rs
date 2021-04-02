@@ -44,6 +44,8 @@ pub enum Yaml {
     Hash(self::Hash),
     /// Alias, not fully supported yet.
     Alias(usize),
+    /// A yaml type with a comment prepended
+    Comment(Vec<String>, Box<Yaml>),
     /// YAML null, e.g. `null` or `~`.
     Null,
     /// Accessing a nonexistent node via the Index trait returns `BadValue`. This
