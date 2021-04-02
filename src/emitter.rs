@@ -642,8 +642,11 @@ a:
 
     fn hash_fixture() -> Yaml {
         let mut hash = Hash::new();
-        let key_with_comment = Yaml::Comment(vec!["comment1".to_string(), "comment2".to_string()], Box::new(Yaml::String("string".to_ascii_lowercase())));
-        hash.insert(key_with_comment, Yaml::Integer(100));
+        let key_with_comment1 = Yaml::Comment(vec!["comment1".to_string(), "comment2".to_string()], Box::new(Yaml::String("string".to_ascii_lowercase())));
+        let key_with_comment2 = Yaml::Comment(vec!["comment3".to_string(), "comment4".to_string()], Box::new(Yaml::String("string".to_ascii_lowercase())));
+        hash.insert(key_with_comment1, Yaml::Integer(100));
+        hash.insert(Yaml::String("blah".to_string()), Yaml::Integer(101));
+        hash.insert(key_with_comment2, Yaml::Integer(101));
         Yaml::Hash(hash)
     }
 
